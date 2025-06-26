@@ -1,9 +1,9 @@
-name: Build and Upload Limiter
+name: Build and Upload limiter
 
 on:
   push:
     paths:
-      - "Limiter.py"
+      - "limiter.py"
 
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
-          script-name: Limiter.py
+          script-name: limiter.py
           standalone: true
           onefile: true
           follow-imports: true

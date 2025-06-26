@@ -1,6 +1,6 @@
 <center>
 
-# Limiter
+# limiter
 
 <b>Limiting the number of active users with IP for [Marzban](https://github.com/Gozargah/Marzban)</b><sub> (with xray logs)</sub><br>
 Supports both IPv4 and IPv6 And Marzban-node
@@ -21,7 +21,7 @@ Supports both IPv4 and IPv6 And Marzban-node
 
 ## Installation
 
-You can install Limiter by running the following command in your terminal:
+You can install limiter by running the following command in your terminal:
 
 ```bash
 bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh)
@@ -52,7 +52,7 @@ After that script runs automatically and you can see the logs.
 
 ## Telegram Bot Commands
 
-Limiter can be controlled via a Telegram bot. Here are the available commands:
+limiter can be controlled via a Telegram bot. Here are the available commands:
 
 - `/start`: Start the bot.
 - `/create_config`: Configure panel information (username, password, etc.).
@@ -77,9 +77,9 @@ Limiter can be controlled via a Telegram bot. Here are the available commands:
     - Why does the number of detected IPs decrease after a while?
     - This problem arises when the WebSocket connection becomes corrupted during log transmission. How ever in the new version of this script this problem mostly solved. But if you still have this problem you can use [CronJob](#using-cron-jobs) method
 
-2.  **Uninstalling Limiter Script**
+2.  **Uninstalling limiter Script**
 
-    - How can I uninstall the Limiter script?
+    - How can I uninstall the limiter script?
     - Simply Stop the script and then delete the script folder.
 
 3.  **Connections Persisting After Disabling**
@@ -100,7 +100,7 @@ Limiter can be controlled via a Telegram bot. Here are the available commands:
 6.  **Tunneling and User IP Detection**
 
     - Tunneling returns the tunnel server IP for users. Any solutions?
-    - Tunneling poses challenges. For better IP detection, consider alternative methods [Read More Here](https://github.com/MatinDehghanian/Limiter/issues/3)
+    - Tunneling poses challenges. For better IP detection, consider alternative methods [Read More Here](https://github.com/MatinDehghanian/limiter/issues/3)
 
 7.  **I'm using haproxy why I don't have logs**
 
@@ -117,14 +117,14 @@ Limiter can be controlled via a Telegram bot. Here are the available commands:
       },
       ```
 
-    And also See this issue : [Read More Here](https://github.com/MatinDehghanian/Limiter/issues/32)
+    And also See this issue : [Read More Here](https://github.com/MatinDehghanian/limiter/issues/32)
 
-If you still have a problem you can open an issue on the [issues page](https://github.com/MatinDehghanian/Limiter/issues)<br>
-**And also you can still use the old version of this script** [here](https://github.com/MatinDehghanian/Limiter/tree/old_version)
+If you still have a problem you can open an issue on the [issues page](https://github.com/MatinDehghanian/limiter/issues)<br>
+**And also you can still use the old version of this script** [here](https://github.com/MatinDehghanian/limiter/tree/old_version)
 
 ## Using Cron Jobs
 
-To ensure that _Limiter_ runs regularly or automatically after a reboot, you can set up a cron job.  
+To ensure that _limiter_ runs regularly or automatically after a reboot, you can set up a cron job.  
 _Note:_ cronjob is **not recommended** for normal work, but if you need just make sure you put Telegram `BOT_TOKEN` and `ADMINS` in the `config.json` file. And also you can still check logs with
 
 ```bash
@@ -155,12 +155,12 @@ You can learn more about cron job scheduling by checking the [Cron Howto](https:
 
 ## Build
 
-Limiter provides pre-built versions for Windows and Linux (both amd64 and arm64) which can be found on the [releases page](https://github.com/MatinDehghanian/Limiter/releases).
+limiter provides pre-built versions for Windows and Linux (both amd64 and arm64) which can be found on the [releases page](https://github.com/MatinDehghanian/limiter/releases).
 
-The Windows_amd64 and Linux_amd64 builds are created using GitHub Actions. You can check the build details on the [actions page](https://github.com/MatinDehghanian/Limiter/actions/).
+The Windows_amd64 and Linux_amd64 builds are created using GitHub Actions. You can check the build details on the [actions page](https://github.com/MatinDehghanian/limiter/actions/).
 
 The Linux_arm64 build is created on a local machine due to GitHub's lack of ARM machines and the build method's lack of support for Cross Compiling. However, you can build it on your own machine, or use GitHub Actions to build it on your own.<br>
-If you want to build Limiter yourself, you'll first need to install the build essentials, which includes gcc, g++, and more. You can do this with the following command:
+If you want to build limiter yourself, you'll first need to install the build essentials, which includes gcc, g++, and more. You can do this with the following command:
 
 ```bash
 sudo apt install build-essential
@@ -179,15 +179,15 @@ python3 -m nuitka --standalone --onefile --follow-imports --include-plugin-direc
 You can also use this program without building it. Just install the dependencies and run it normally:
 
 ```bash
-git clone https://github.com/MatinDehghanian/Limiter.git
-cd Limiter
+git clone https://github.com/MatinDehghanian/limiter.git
+cd limiter
 pip install -r requirements.txt
 python3 limiter.py
 ```
 
 then like older version you can use `screen` and `cornjob` to run it in background.<sub>(And also don't forget to add your panel information and bot token and telegram user id to config.json file)</sub><br>
-[run with screen](https://github.com/MatinDehghanian/Limiter/blob/old_version/Marzban/README.md#screen)<br>
-[run with cornjob](https://github.com/MatinDehghanian/Limiter/blob/old_version/Marzban/README.md#screen)<br>
+[run with screen](https://github.com/MatinDehghanian/limiter/blob/old_version/Marzban/README.md#screen)<br>
+[run with cornjob](https://github.com/MatinDehghanian/limiter/blob/old_version/Marzban/README.md#screen)<br>
 
 <sub>
 And a small side note if you want to make any changes to the code and then test it, you can use the `core_test.py` file to test the core functions of the program.(Please note that running this make your panel unstable so make sure you run it on a test panel)
@@ -197,7 +197,7 @@ And a small side note if you want to make any changes to the code and then test 
 
 ## Donations
 
-If you found Limiter useful and would like to support its development, you can donate on the following crypto network:
+If you found limiter useful and would like to support its development, you can donate on the following crypto network:
 
 - TRON network (TRX): `TLARb1Ns5vA7pH6wqSyZGreDbGooS85Mi5`
 

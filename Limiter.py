@@ -1,5 +1,5 @@
 """
-Limiter.py is the
+limiter.py is the
 main file that run other files and functions to run the program.
 """
 

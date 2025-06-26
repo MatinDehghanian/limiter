@@ -25,10 +25,10 @@ download_program() {
 
     if [ "$architecture" == "x86_64" ]; then
         url=""
-        filename="Limiter_amd64.bin"
+        filename="limiter_amd64.bin"
     elif [ "$architecture" == "aarch64" ]; then
         url=""
-        filename="Limiter_arm64.bin"
+        filename="limiter_arm64.bin"
     else
         echo "Unsupported architecture: $architecture"
         return
@@ -44,9 +44,9 @@ update_program() {
     local filename
 
     if [ "$(uname -m)" == "x86_64" ]; then
-        filename="Limiter_amd64.bin"
+        filename="limiter_amd64.bin"
     elif [ "$(uname -m)" == "aarch64" ]; then
-        filename="Limiter_arm64.bin"
+        filename="limiter_arm64.bin"
     else
         echo "Unsupported architecture: $(uname -m)"
         return
@@ -60,16 +60,16 @@ update_program() {
     echo "The program has been updated."
 }
 is_running() {
-    screen -list | grep -q "Limiter"
+    screen -list | grep -q "limiter"
 }
 
 start_program() {
     local filename
 
     if [ "$(uname -m)" == "x86_64" ]; then
-        filename="Limiter_amd64.bin"
+        filename="limiter_amd64.bin"
     elif [ "$(uname -m)" == "aarch64" ]; then
-        filename="Limiter_arm64.bin"
+        filename="limiter_arm64.bin"
     else
         echo "Unsupported architecture: $(uname -m)"
         return
@@ -90,14 +90,14 @@ start_program() {
     if is_running; then
         echo "The program is already running."
     else
-        screen -Sdm Limiter bash -c "./$filename"
+        screen -Sdm limiter bash -c "./$filename"
         echo "The program has been started."
     fi
 }
 
 stop_program() {
     if is_running; then
-        screen -S Limiter -X quit
+        screen -S limiter -X quit
         echo "The program has been stopped."
     else
         echo "The program is not running."
@@ -109,7 +109,7 @@ attach_program() {
         echo "You are about to attach to the program's screen session. To detach without stopping the program, press Ctrl-a followed by d."
         read -p "Do you want to continue? (y/n) " confirm
         if [[ $confirm == [Yy]* ]]; then
-            screen -r Limiter
+            screen -r limiter
         else
             echo "Operation cancelled."
         fi
