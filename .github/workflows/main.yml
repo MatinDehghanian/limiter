@@ -1,4 +1,4 @@
-name: Build and Upload limiter
+name: Build and Upload limiter bin
 
 on:
   push:
