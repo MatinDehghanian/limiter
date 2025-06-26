@@ -4,16 +4,15 @@ Test script to verify CDN scenario handling
 """
 
 import asyncio
-import sys
-import os
 import ipaddress
-
-# Add the current directory to the Python path so we can import the modules
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import os
+import sys
 
 from utils.check_usage import ACTIVE_USERS, check_ip_used
 from utils.types import UserType
 
+# Add the current directory to the Python path so we can import the modules
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
     """
@@ -55,7 +54,6 @@ def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
 
     # Return the subnet representations
     return list(subnet_groups.keys())
-
 
 async def test_cdn_scenario():
     """Test the CDN scenario with multiple IPs from the same subnet"""
@@ -134,7 +132,6 @@ async def test_cdn_scenario():
 
     # Clean up
     ACTIVE_USERS.clear()
-
 
 if __name__ == "__main__":
     asyncio.run(test_cdn_scenario())
