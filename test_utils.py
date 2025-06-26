@@ -2,29 +2,22 @@
 """
 Shared test utilities for CDN scenario testing
 """
-
 import ipaddress
 from collections import Counter
-
-
 def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
     """
     Group IPs by their /24 subnet and return unique subnets.
     This helps handle CDN scenarios where multiple IPs come from the same subnet.
-
     Args:
         ip_list (list[str]): List of IP addresses
-
     Returns:
         list[str]: List of unique subnet representations (e.g., "140.248.74.x")
     """
     subnet_groups = {}
-
     for ip in ip_list:
         try:
             # Parse the IP address
             ip_obj = ipaddress.ip_address(ip)
-
             # For IPv4, group by /24 subnet (first 3 octets)
             if ip_obj.version == 4:
                 # Get the network address for /24 subnet
@@ -33,22 +26,17 @@ def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
             else:
                 # For IPv6, use the full IP as is (less common for CDN scenarios)
                 subnet_key = str(ip_obj)
-
             if subnet_key not in subnet_groups:
                 subnet_groups[subnet_key] = []
             subnet_groups[subnet_key].append(ip)
-
         except ValueError:
             # If IP parsing fails, treat as individual IP
             subnet_key = ip
             if subnet_key not in subnet_groups:
                 subnet_groups[subnet_key] = []
             subnet_groups[subnet_key].append(ip)
-
     # Return the subnet representations
     return list(subnet_groups.keys())
-
-
 def get_cdn_test_ips() -> list[str]:
     """
     Get the CDN test IPs for testing scenarios.
@@ -84,8 +72,6 @@ def get_cdn_test_ips() -> list[str]:
         '140.248.74.95', '140.248.74.153', '140.248.74.159', '140.248.74.63', '140.248.74.160',
         '140.248.74.25', '140.248.74.106', '140.248.74.88', '140.248.74.98', '140.248.74.135'
     ]
-
-
 def simulate_check_ip_used_logic(active_users: dict) -> dict:
     """
     Simulate the check_ip_used logic without external dependencies
@@ -96,14 +82,10 @@ def simulate_check_ip_used_logic(active_users: dict) -> dict:
         ip_counts = Counter(data["ip"])
         # Filter IPs that appear more than 2 times
         filtered_ips = list({ip for ip in data["ip"] if ip_counts[ip] > 2})
-
         # Group IPs by subnet to handle CDN scenarios
         subnet_ips = group_ips_by_subnet(filtered_ips)
         all_users_log[email] = subnet_ips
-
     return all_users_log
-
-
 def print_test_results(user_subnets: list, expected_subnet: str, test_name: str) -> None:
     """
     Print standardized test results.
@@ -114,7 +96,6 @@ def print_test_results(user_subnets: list, expected_subnet: str, test_name: str)
         test_name: Name of the test
     """
     print(f"User {test_name} has {len(user_subnets)} subnet(s): {user_subnets}")
-
     # Verify that it's counted as 1 subnet instead of 130+ IPs
     if len(user_subnets) == 1 and expected_subnet in user_subnets:
         print("✅ SUCCESS: CDN scenario handled correctly!")
@@ -122,8 +103,6 @@ def print_test_results(user_subnets: list, expected_subnet: str, test_name: str)
         print("   - This prevents false warnings about too many active IPs")
     else:
         print("❌ FAILED: CDN scenario not handled correctly")
-
-
 def check_user_result(result: dict, user_name: str, expected_subnet: str) -> None:
     """
     Check if a user exists in results and print standardized output.
@@ -137,4 +116,4 @@ def check_user_result(result: dict, user_name: str, expected_subnet: str) -> Non
         user_subnets = result[user_name]
         print_test_results(user_subnets, expected_subnet, user_name)
     else:
-        print("❌ FAILED: User not found in results") 
+        print("❌ FAILED: User not found in results")
