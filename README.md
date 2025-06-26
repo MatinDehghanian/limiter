@@ -24,7 +24,7 @@ Supports both IPv4 and IPv6 And Marzban-node
 You can install limiter by running the following command in your terminal:
 
 ```bash
-bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/MatinDehghanian/limiter/refs/heads/master/limiter.sh)
 ```
 
 After running the command, you will see a menu with the following options:
@@ -128,7 +128,7 @@ To ensure that _limiter_ runs regularly or automatically after a reboot, you can
 _Note:_ cronjob is **not recommended** for normal work, but if you need just make sure you put Telegram `BOT_TOKEN` and `ADMINS` in the `config.json` file. And also you can still check logs with
 
 ```bash
-bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/MatinDehghanian/limiter/refs/heads/master/limiter.sh)
 ```
 
 and then choose `3. Attach to the script`<br>
@@ -142,13 +142,13 @@ crontab -e
 Add a new line to schedule script. For example:
 
 ```bash
-0 */6 * * * bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) stop && bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) start
+0 */6 * * * bash <(curl -sSL https://raw.githubusercontent.com/MatinDehghanian/limiter/refs/heads/master/limiter.sh) stop && bash <(curl -sSL https://raw.githubusercontent.com/MatinDehghanian/limiter/refs/heads/master/limiter.sh) start
 ```
 
 Or run at system reboot:
 
 ```bash
-@reboot bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) start
+@reboot bash <(curl -sSL https://raw.githubusercontent.com/MatinDehghanian/limiter/refs/heads/master/limiter.sh) start
 ```
 
 You can learn more about cron job scheduling by checking the [Cron Howto](https://help.ubuntu.com/community/CronHowto) guide.
