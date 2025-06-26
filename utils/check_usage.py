@@ -82,19 +82,60 @@ async def check_ip_used() -> dict:
             reverse=True,
         )
     )
-    messages = [
-        f"<code>{email}</code> with <code>{len(ips)}</code> active ip  \n- "
-        + "\n- ".join(ips)
-        for email, ips in all_users_log.items()
-        if ips
-    ]
+    
+    # Create a more compact message format for better readability
+    user_messages = []
+    for email, ips in all_users_log.items():
+        if ips:
+            if len(ips) == 1:
+                # Single subnet - show it inline
+                user_messages.append(f"<code>{email}</code> with <code>{len(ips)}</code> active ip: <code>{ips[0]}</code>")
+            else:
+                # Multiple subnets - show them on separate lines
+                user_messages.append(f"<code>{email}</code> with <code>{len(ips)}</code> active ips:\n- " + "\n- ".join(ips))
+    
     logger.info("Number of all active ips: %s", str(total_ips))
-    messages.append(f"---------\nCount Of All Active IPs: <b>{total_ips}</b>")
-    shorter_messages = [
-        "\n".join(messages[i : i + 100]) for i in range(0, len(messages), 100)
-    ]
-    for message in shorter_messages:
+    
+    # Add total count
+    summary_message = f"---------\nCount Of All Active IPs: <b>{total_ips}</b>"
+    
+    # Split messages into chunks to avoid Telegram's message length limit
+    # Telegram has a 4096 character limit, so we'll be conservative with 3000 chars
+    MAX_MESSAGE_LENGTH = 3000
+    current_message = ""
+    message_chunks = []
+    
+    for user_msg in user_messages:
+        # Check if adding this user would exceed the limit
+        if len(current_message) + len(user_msg) + 2 > MAX_MESSAGE_LENGTH:
+            # Save current chunk and start a new one
+            if current_message:
+                message_chunks.append(current_message.strip())
+            current_message = user_msg
+        else:
+            # Add to current chunk
+            if current_message:
+                current_message += "\n\n" + user_msg
+            else:
+                current_message = user_msg
+    
+    # Add the last chunk if it has content
+    if current_message:
+        message_chunks.append(current_message.strip())
+    
+    # Add summary to the last chunk
+    if message_chunks:
+        message_chunks[-1] += "\n\n" + summary_message
+    
+    # Send all chunks
+    for i, message in enumerate(message_chunks):
+        if i > 0:
+            # Add header for subsequent chunks
+            message = f"<b>Active Users (Part {i+1}):</b>\n\n" + message
+        else:
+            message = "<b>Active Users:</b>\n\n" + message
         await send_logs(message)
+    
     return all_users_log
 
 
