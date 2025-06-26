@@ -6,6 +6,7 @@ Test script to verify CDN scenario handling
 import asyncio
 import sys
 import os
+import ipaddress
 
 # Add the current directory to the Python path so we can import the modules
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,6 @@ def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
     Returns:
         list[str]: List of unique subnet representations (e.g., "140.248.74.x")
     """
-    import ipaddress
     subnet_groups = {}
 
     for ip in ip_list:
@@ -129,7 +129,7 @@ async def test_cdn_scenario():
         else:
             print("❌ FAILED: User not found in results")
 
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-exception-caught
         print(f"❌ ERROR: {error}")
 
     # Clean up
