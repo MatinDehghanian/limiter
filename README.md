@@ -24,7 +24,7 @@ Supports both IPv4 and IPv6 And Marzban-node
 You can install Limiter by running the following command in your terminal:
 
 ```bash
-bash <(curl -sSL https://MatinDehghanian.github.io/Limiter.sh)
+bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh)
 ```
 
 After running the command, you will see a menu with the following options:
@@ -128,7 +128,7 @@ To ensure that _Limiter_ runs regularly or automatically after a reboot, you can
 _Note:_ cronjob is **not recommended** for normal work, but if you need just make sure you put Telegram `BOT_TOKEN` and `ADMINS` in the `config.json` file. And also you can still check logs with
 
 ```bash
-bash <(curl -sSL https://MatinDehghanian.github.io/Limiter.sh)
+bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh)
 ```
 
 and then choose `3. Attach to the script`<br>
@@ -142,13 +142,13 @@ crontab -e
 Add a new line to schedule script. For example:
 
 ```bash
-0 */6 * * * bash <(curl -sSL https://MatinDehghanian.github.io/Limiter.sh) stop && bash <(curl -sSL https://MatinDehghanian.github.io/Limiter.sh) start
+0 */6 * * * bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) stop && bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) start
 ```
 
 Or run at system reboot:
 
 ```bash
-@reboot bash <(curl -sSL https://MatinDehghanian.github.io/Limiter.sh) start
+@reboot bash <(curl -sSL https://MatinDehghanian.github.io/limiter.sh) start
 ```
 
 You can learn more about cron job scheduling by checking the [Cron Howto](https://help.ubuntu.com/community/CronHowto) guide.
@@ -171,7 +171,7 @@ Next, install the necessary dependencies:<br>
 And at the end you build it with [nuitka](https://nuitka.net/)<br>
 
 ```bash
-python3 -m nuitka --standalone --onefile --follow-imports --include-plugin-directory=utils --include-package=websockets,logging --python-flag="-OO" Limiter.py
+python3 -m nuitka --standalone --onefile --follow-imports --include-plugin-directory=utils --include-package=websockets,logging --python-flag="-OO" limiter.py
 ```
 
 ### Running Without Building
@@ -182,7 +182,7 @@ You can also use this program without building it. Just install the dependencies
 git clone https://github.com/MatinDehghanian/Limiter.git
 cd Limiter
 pip install -r requirements.txt
-python3 Limiter.py
+python3 limiter.py
 ```
 
 then like older version you can use `screen` and `cornjob` to run it in background.<sub>(And also don't forget to add your panel information and bot token and telegram user id to config.json file)</sub><br>
@@ -205,4 +205,4 @@ Thank you for your support!
 
 If this program was useful for you, please give it a star ⭐
 
-Proudly forked from MatinDehghanian
+Proudly forked from houshmand-2005
