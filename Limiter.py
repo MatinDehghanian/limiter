@@ -1,5 +1,5 @@
 """
-v2iplimit.py is the
+Limiter.py is the
 main file that run other files and functions to run the program.
 """
 

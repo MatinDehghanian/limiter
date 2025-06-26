@@ -24,11 +24,11 @@ download_program() {
     local filename
 
     if [ "$architecture" == "x86_64" ]; then
-        url="https://github.com/houshmand-2005/V2IpLimit/releases/download/1.0.6/v2iplimit_amd64_linux.bin"
-        filename="v2iplimit_amd64.bin"
+        url=""
+        filename="Limiter_amd64.bin"
     elif [ "$architecture" == "aarch64" ]; then
-        url="https://github.com/houshmand-2005/V2IpLimit/releases/download/1.0.6/v2iplimit_arm64_linux.bin"
-        filename="v2iplimit_arm64.bin"
+        url=""
+        filename="Limiter_arm64.bin"
     else
         echo "Unsupported architecture: $architecture"
         return
@@ -44,9 +44,9 @@ update_program() {
     local filename
 
     if [ "$(uname -m)" == "x86_64" ]; then
-        filename="v2iplimit_amd64.bin"
+        filename="Limiter_amd64.bin"
     elif [ "$(uname -m)" == "aarch64" ]; then
-        filename="v2iplimit_arm64.bin"
+        filename="Limiter_arm64.bin"
     else
         echo "Unsupported architecture: $(uname -m)"
         return
@@ -60,16 +60,16 @@ update_program() {
     echo "The program has been updated."
 }
 is_running() {
-    screen -list | grep -q "v2iplimit"
+    screen -list | grep -q "Limiter"
 }
 
 start_program() {
     local filename
 
     if [ "$(uname -m)" == "x86_64" ]; then
-        filename="v2iplimit_amd64.bin"
+        filename="Limiter_amd64.bin"
     elif [ "$(uname -m)" == "aarch64" ]; then
-        filename="v2iplimit_arm64.bin"
+        filename="Limiter_arm64.bin"
     else
         echo "Unsupported architecture: $(uname -m)"
         return
@@ -90,14 +90,14 @@ start_program() {
     if is_running; then
         echo "The program is already running."
     else
-        screen -Sdm v2iplimit bash -c "./$filename"
+        screen -Sdm Limiter bash -c "./$filename"
         echo "The program has been started."
     fi
 }
 
 stop_program() {
     if is_running; then
-        screen -S v2iplimit -X quit
+        screen -S Limiter -X quit
         echo "The program has been stopped."
     else
         echo "The program is not running."
@@ -109,7 +109,7 @@ attach_program() {
         echo "You are about to attach to the program's screen session. To detach without stopping the program, press Ctrl-a followed by d."
         read -p "Do you want to continue? (y/n) " confirm
         if [[ $confirm == [Yy]* ]]; then
-            screen -r v2iplimit
+            screen -r Limiter
         else
             echo "Operation cancelled."
         fi
