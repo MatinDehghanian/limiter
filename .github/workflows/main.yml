@@ -1,4 +1,4 @@
-name: Build and Upload limiter bin
+name: Build and Upload limiter
 
 on:
   push:
@@ -32,9 +32,7 @@ jobs:
         with:
           nuitka-version: main
           script-name: limiter.py
-          standalone: true
-          onefile: true
-          follow-imports: true
+          mode: "onefile"
           include-package: "websockets,logging"
           python-flag: "-OO"
 
