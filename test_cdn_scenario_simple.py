@@ -11,20 +11,20 @@ def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
     """
     Group IPs by their /24 subnet and return unique subnets.
     This helps handle CDN scenarios where multiple IPs come from the same subnet.
-    
+
     Args:
         ip_list (list[str]): List of IP addresses
-        
+
     Returns:
         list[str]: List of unique subnet representations (e.g., "140.248.74.x")
     """
     subnet_groups = {}
-    
+
     for ip in ip_list:
         try:
             # Parse the IP address
             ip_obj = ipaddress.ip_address(ip)
-            
+
             # For IPv4, group by /24 subnet (first 3 octets)
             if ip_obj.version == 4:
                 # Get the network address for /24 subnet
@@ -33,18 +33,18 @@ def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
             else:
                 # For IPv6, use the full IP as is (less common for CDN scenarios)
                 subnet_key = str(ip_obj)
-            
+
             if subnet_key not in subnet_groups:
                 subnet_groups[subnet_key] = []
             subnet_groups[subnet_key].append(ip)
-            
+
         except ValueError:
             # If IP parsing fails, treat as individual IP
             subnet_key = ip
             if subnet_key not in subnet_groups:
                 subnet_groups[subnet_key] = []
             subnet_groups[subnet_key].append(ip)
-    
+
     # Return the subnet representations
     return list(subnet_groups.keys())
 
@@ -59,17 +59,17 @@ def simulate_check_ip_used_logic(active_users: dict) -> dict:
         ip_counts = Counter(data["ip"])
         # Filter IPs that appear more than 2 times
         filtered_ips = list({ip for ip in data["ip"] if ip_counts[ip] > 2})
-        
+
         # Group IPs by subnet to handle CDN scenarios
         subnet_ips = group_ips_by_subnet(filtered_ips)
         all_users_log[email] = subnet_ips
-    
+
     return all_users_log
 
 
 def test_cdn_scenario():
     """Test the CDN scenario with multiple IPs from the same subnet"""
-    
+
     # Simulate the CDN scenario from the user's example
     cdn_ips = [
         '140.248.74.46', '140.248.74.171', '140.248.74.76', '140.248.74.56', '140.248.74.107',
@@ -99,34 +99,34 @@ def test_cdn_scenario():
         '140.248.74.95', '140.248.74.153', '140.248.74.159', '140.248.74.63', '140.248.74.160',
         '140.248.74.25', '140.248.74.106', '140.248.74.88', '140.248.74.98', '140.248.74.135'
     ]
-    
+
     # Add duplicates to ensure IPs appear more than 2 times
     cdn_ips_with_duplicates = cdn_ips + cdn_ips + cdn_ips[:20]  # Add many duplicates
-    
+
     # Create a user with all these IPs
     active_users = {
         "MattDev": {"name": "MattDev", "ip": cdn_ips_with_duplicates}
     }
-    
+
     print("=== CDN Scenario Test ===")
     print(f"Original IP count: {len(cdn_ips_with_duplicates)}")
     print(f"Original unique IPs: {len(set(cdn_ips_with_duplicates))}")
-    
+
     # Test the subnet grouping function directly
     subnet_ips = group_ips_by_subnet(cdn_ips_with_duplicates)
     print(f"After subnet grouping: {len(subnet_ips)}")
     print(f"Subnet representations: {subnet_ips}")
-    
+
     # Test the full logic
     print("\n=== Testing complete logic ===")
     result = simulate_check_ip_used_logic(active_users)
     print(f"Result: {result}")
-    
+
     # Check if the user has the expected subnet count
     if "MattDev" in result:
         user_subnets = result["MattDev"]
         print(f"User MattDev has {len(user_subnets)} subnet(s): {user_subnets}")
-        
+
         # Verify that it's counted as 1 subnet instead of 130+ IPs
         if len(user_subnets) == 1 and "140.248.74.x" in user_subnets:
             print("✅ SUCCESS: CDN scenario handled correctly!")
@@ -136,7 +136,7 @@ def test_cdn_scenario():
             print("❌ FAILED: CDN scenario not handled correctly")
     else:
         print("❌ FAILED: User not found in results")
-    
+
     # Test with mixed IPs from different subnets
     print("\n=== Testing mixed subnets ===")
     mixed_ips = [
@@ -144,33 +144,33 @@ def test_cdn_scenario():
         '192.168.1.1', '192.168.1.2', '192.168.1.3',        # Different subnet
         '8.8.8.8', '1.1.1.1'                                # Individual IPs
     ]
-    
+
     # Add duplicates to ensure they appear more than 2 times
     mixed_ips_with_duplicates = mixed_ips + mixed_ips + mixed_ips[:4]
-    
+
     mixed_users = {
         "TestUser": {"name": "TestUser", "ip": mixed_ips_with_duplicates}
     }
-    
+
     mixed_result = simulate_check_ip_used_logic(mixed_users)
     print(f"Mixed result: {mixed_result}")
-    
+
     if "TestUser" in mixed_result:
         user_subnets = mixed_result["TestUser"]
         print(f"User TestUser has {len(user_subnets)} subnet(s): {user_subnets}")
-        
+
         # Should have 4 different subnets
         if len(user_subnets) == 4:
             print("✅ SUCCESS: Mixed subnets handled correctly!")
         else:
             print("❌ FAILED: Mixed subnets not handled correctly")
-    
+
     # Test subnet grouping without filtering (to show the core functionality)
     print("\n=== Testing subnet grouping without filtering ===")
     direct_subnet_result = group_ips_by_subnet(cdn_ips)
     print(f"Direct subnet grouping of {len(cdn_ips)} IPs: {len(direct_subnet_result)} subnets")
     print(f"Subnet representations: {direct_subnet_result}")
-    
+
     if len(direct_subnet_result) == 1 and "140.248.74.x" in direct_subnet_result:
         print("✅ SUCCESS: Core subnet grouping works correctly!")
     else:
@@ -178,4 +178,4 @@ def test_cdn_scenario():
 
 
 if __name__ == "__main__":
-    test_cdn_scenario() 
+    test_cdn_scenario()

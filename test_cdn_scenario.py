@@ -10,16 +10,59 @@ import os
 # Add the current directory to the Python path so we can import the modules
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from utils.check_usage import ACTIVE_USERS, group_ips_by_subnet, check_ip_used
+from utils.check_usage import ACTIVE_USERS, check_ip_used
 from utils.types import UserType
+
+
+def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
+    """
+    Group IPs by their /24 subnet and return unique subnets.
+    This helps handle CDN scenarios where multiple IPs come from the same subnet.
+
+    Args:
+        ip_list (list[str]): List of IP addresses
+
+    Returns:
+        list[str]: List of unique subnet representations (e.g., "140.248.74.x")
+    """
+    import ipaddress
+    subnet_groups = {}
+
+    for ip in ip_list:
+        try:
+            # Parse the IP address
+            ip_obj = ipaddress.ip_address(ip)
+
+            # For IPv4, group by /24 subnet (first 3 octets)
+            if ip_obj.version == 4:
+                # Get the network address for /24 subnet
+                network = ipaddress.ip_network(f"{ip}/24", strict=False)
+                subnet_key = f"{network.network_address.exploded.rsplit('.', 1)[0]}.x"
+            else:
+                # For IPv6, use the full IP as is (less common for CDN scenarios)
+                subnet_key = str(ip_obj)
+
+            if subnet_key not in subnet_groups:
+                subnet_groups[subnet_key] = []
+            subnet_groups[subnet_key].append(ip)
+
+        except ValueError:
+            # If IP parsing fails, treat as individual IP
+            subnet_key = ip
+            if subnet_key not in subnet_groups:
+                subnet_groups[subnet_key] = []
+            subnet_groups[subnet_key].append(ip)
+
+    # Return the subnet representations
+    return list(subnet_groups.keys())
 
 
 async def test_cdn_scenario():
     """Test the CDN scenario with multiple IPs from the same subnet"""
-    
+
     # Clear any existing data
     ACTIVE_USERS.clear()
-    
+
     # Simulate the CDN scenario from the user's example
     cdn_ips = [
         '140.248.74.46', '140.248.74.171', '140.248.74.76', '140.248.74.56', '140.248.74.107',
@@ -49,33 +92,33 @@ async def test_cdn_scenario():
         '140.248.74.95', '140.248.74.153', '140.248.74.159', '140.248.74.63', '140.248.74.160',
         '140.248.74.25', '140.248.74.106', '140.248.74.88', '140.248.74.98', '140.248.74.135'
     ]
-    
+
     # Add some duplicate IPs to simulate the "appears more than two times" logic
     cdn_ips_with_duplicates = cdn_ips + cdn_ips[:10]  # Add some duplicates
-    
+
     # Create a user with all these IPs
     ACTIVE_USERS["MattDev"] = UserType(name="MattDev", ip=cdn_ips_with_duplicates)
-    
+
     print("=== CDN Scenario Test ===")
     print(f"Original IP count: {len(cdn_ips_with_duplicates)}")
     print(f"Original unique IPs: {len(set(cdn_ips_with_duplicates))}")
-    
+
     # Test the subnet grouping function directly
     subnet_ips = group_ips_by_subnet(cdn_ips_with_duplicates)
     print(f"After subnet grouping: {len(subnet_ips)}")
     print(f"Subnet representations: {subnet_ips}")
-    
+
     # Test the full check_ip_used function
     print("\n=== Testing check_ip_used function ===")
     try:
         result = await check_ip_used()
         print(f"Result from check_ip_used: {result}")
-        
+
         # Check if the user has the expected subnet count
         if "MattDev" in result:
             user_subnets = result["MattDev"]
             print(f"User MattDev has {len(user_subnets)} subnet(s): {user_subnets}")
-            
+
             # Verify that it's counted as 1 subnet instead of 130+ IPs
             if len(user_subnets) == 1 and "140.248.74.x" in user_subnets:
                 print("✅ SUCCESS: CDN scenario handled correctly!")
@@ -85,13 +128,13 @@ async def test_cdn_scenario():
                 print("❌ FAILED: CDN scenario not handled correctly")
         else:
             print("❌ FAILED: User not found in results")
-            
-    except Exception as e:
-        print(f"❌ ERROR: {e}")
-    
+
+    except Exception as error:
+        print(f"❌ ERROR: {error}")
+
     # Clean up
     ACTIVE_USERS.clear()
 
 
 if __name__ == "__main__":
-    asyncio.run(test_cdn_scenario()) 
+    asyncio.run(test_cdn_scenario())
