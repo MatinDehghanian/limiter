@@ -4,6 +4,7 @@ appears more than two times in the ACTIVE_USERS list.
 """
 
 import asyncio
+import ipaddress
 from collections import Counter
 
 from telegram_bot.send_message import send_logs
@@ -15,6 +16,48 @@ from utils.types import PanelType, UserType
 ACTIVE_USERS: dict[str, UserType] | dict = {}
 
 
+def group_ips_by_subnet(ip_list: list[str]) -> list[str]:
+    """
+    Group IPs by their /24 subnet and return unique subnets.
+    This helps handle CDN scenarios where multiple IPs come from the same subnet.
+
+    Args:
+        ip_list (list[str]): List of IP addresses
+
+    Returns:
+        list[str]: List of unique subnet representations (e.g., "140.248.74.x")
+    """
+    subnet_groups = {}
+
+    for ip in ip_list:
+        try:
+            # Parse the IP address
+            ip_obj = ipaddress.ip_address(ip)
+
+            # For IPv4, group by /24 subnet (first 3 octets)
+            if ip_obj.version == 4:
+                # Get the network address for /24 subnet
+                network = ipaddress.ip_network(f"{ip}/24", strict=False)
+                subnet_key = f"{network.network_address.exploded.rsplit('.', 1)[0]}.x"
+            else:
+                # For IPv6, use the full IP as is (less common for CDN scenarios)
+                subnet_key = str(ip_obj)
+
+            if subnet_key not in subnet_groups:
+                subnet_groups[subnet_key] = []
+            subnet_groups[subnet_key].append(ip)
+
+        except ValueError:
+            # If IP parsing fails, treat as individual IP
+            subnet_key = ip
+            if subnet_key not in subnet_groups:
+                subnet_groups[subnet_key] = []
+            subnet_groups[subnet_key].append(ip)
+
+    # Return the subnet representations
+    return list(subnet_groups.keys())
+
+
 async def check_ip_used() -> dict:
     """
     This function checks if a user (name and IP address)
@@ -24,8 +67,12 @@ async def check_ip_used() -> dict:
     for email in list(ACTIVE_USERS.keys()):
         data = ACTIVE_USERS[email]
         ip_counts = Counter(data.ip)
-        data.ip = list({ip for ip in data.ip if ip_counts[ip] > 2})
-        all_users_log[email] = data.ip
+        # Filter IPs that appear more than 2 times
+        filtered_ips = list({ip for ip in data.ip if ip_counts[ip] > 2})
+        
+        # Group IPs by subnet to handle CDN scenarios
+        subnet_ips = group_ips_by_subnet(filtered_ips)
+        all_users_log[email] = subnet_ips
         logger.info(data)
     total_ips = sum(len(ips) for ips in all_users_log.values())
     all_users_log = dict(
