@@ -24,10 +24,10 @@ download_program() {
     local filename
 
     if [ "$architecture" == "x86_64" ]; then
-        url="https://github.com/MatinDehghanian/limiter/releases/download/v0.2/limiter.bin"
+        url="https://github.com/MatinDehghanian/limiter/releases/latest/download/limiter.bin"
         filename="Limiter_amd64.bin"
     elif [ "$architecture" == "aarch64" ]; then
-        url="https://github.com/MatinDehghanian/limiter/releases/download/v0.2/limiter.bin"
+        url="https://github.com/MatinDehghanian/limiter/releases/latest/download/limiter.bin"
         filename="Limiter_arm64.bin"
     else
         echo "Unsupported architecture: $architecture"
