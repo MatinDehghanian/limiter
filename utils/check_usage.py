@@ -165,7 +165,12 @@ async def check_ip_used() -> dict:
             message = f"<b>Active Users (Part {i+1}):</b>\n\n" + message
         else:
             message = "<b>Active Users:</b>\n\n" + message
-        await send_logs(message)
+        logger.info(f"Sending message part {i+1}/{len(message_chunks)} ({len(message)} chars)")
+        try:
+            await send_logs(message)
+            await asyncio.sleep(1)  # Add a 1-second delay to avoid Telegram rate limits
+        except Exception as e:
+            logger.error(f"Failed to send message part {i+1}: {e}")
     
     return all_users_log
 
