@@ -90,7 +90,8 @@ are counted (to increase accuracy)</code>
 (if user not in special limit list then this is they limit number)</code>
 <b>/set_check_interval</b>\n<code>Set the check interval time </code>
 <b>/set_time_to_active_users</b>\n<code>Set the time to active users</code>
-<b>/backup</b> \n<code>Sends 'config.json' file</code>"""
+<b>/backup</b> \n<code>Sends 'config.json' file</code>
+<b>/show_single_ip_users</b> <code>Show/hide users with only 1 active IP in logs. Usage: /show_single_ip_users on|off</code>"""
 
 
 async def send_logs(msg):
@@ -581,7 +582,20 @@ async def show_single_ip_users_command(update: Update, context: ContextTypes.DEF
     if check:
         return check
 
-    if not context.args or context.args[0].lower() not in ("on", "off"):
+    if not context.args:
+        # Show current status
+        try:
+            with open("config.json", "r", encoding="utf-8") as f:
+                config = json.load(f)
+            value = config.get("SHOW_SINGLE_IP_USERS", True)
+            await update.message.reply_html(
+                f"SHOW_SINGLE_IP_USERS is currently <b>{'on' if value else 'off'}</b>."
+            )
+        except Exception as e:
+            await update.message.reply_html(f"Failed to read config: <code>{e}</code>")
+        return
+
+    if context.args[0].lower() not in ("on", "off"):
         await update.message.reply_html(
             "Usage: <code>/show_single_ip_users on</code> or <code>/show_single_ip_users off</code>"
         )
