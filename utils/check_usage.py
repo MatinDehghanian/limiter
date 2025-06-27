@@ -116,10 +116,16 @@ async def check_ip_used() -> dict:
     # Add summary
     complete_message += "\n\n" + summary_message
     
+    # Debug logging
+    logger.info(f"Complete message length: {len(complete_message)} characters")
+    logger.info(f"Message length limit: {MAX_MESSAGE_LENGTH} characters")
+    
     # If message is under limit, send as single message
     if len(complete_message) <= MAX_MESSAGE_LENGTH:
         message_chunks = [complete_message]
+        logger.info("Message is under limit - sending as single message")
     else:
+        logger.info("Message exceeds limit - splitting into multiple parts")
         # Split into 2 or 3 parts
         total_length = len(complete_message)
         if total_length <= MAX_MESSAGE_LENGTH * 2:
@@ -135,6 +141,7 @@ async def check_ip_used() -> dict:
                 complete_message[:split_point].strip(),
                 complete_message[split_point:].strip()
             ]
+            logger.info(f"Split into 2 parts: {len(message_chunks[0])} and {len(message_chunks[1])} chars")
         else:
             # Split into 3 parts
             part_length = total_length // 3
@@ -157,18 +164,22 @@ async def check_ip_used() -> dict:
                 complete_message[split_point1:split_point2].strip(),
                 complete_message[split_point2:].strip()
             ]
+            logger.info(f"Split into 3 parts: {len(message_chunks[0])}, {len(message_chunks[1])}, and {len(message_chunks[2])} chars")
     
     # Send all chunks
     for i, message in enumerate(message_chunks):
-        if i > 0:
-            # Add header for subsequent chunks
-            message = f"<b>Active Users (Part {i+1}):</b>\n\n" + message
+        if len(message_chunks) > 1:
+            # Add part number to the top of each message when split
+            message = f"<b>📋 Part {i+1} of {len(message_chunks)}</b>\n\n" + message
         else:
             message = "<b>Active Users:</b>\n\n" + message
+        
         logger.info(f"Sending message part {i+1}/{len(message_chunks)} ({len(message)} chars)")
         try:
             await send_logs(message)
-            await asyncio.sleep(1)  # Add a 1-second delay to avoid Telegram rate limits
+            # Add delay between messages to avoid rate limits
+            if i < len(message_chunks) - 1:  # Don't delay after the last message
+                await asyncio.sleep(2)  # Increased delay to 2 seconds
         except Exception as e:
             logger.error(f"Failed to send message part {i+1}: {e}")
     
