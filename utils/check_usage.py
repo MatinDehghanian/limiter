@@ -63,17 +63,18 @@ async def check_ip_used() -> dict:
     This function checks if a user (name and IP address)
     appears more than two times in the ACTIVE_USERS list.
     """
+    config_data = await read_config()
+    show_single_ip_users = config_data.get("SHOW_SINGLE_IP_USERS", True)
     all_users_log = {}
     for email in list(ACTIVE_USERS.keys()):
         data = ACTIVE_USERS[email]
         ip_counts = Counter(data.ip)
         # Filter IPs that appear more than 2 times
         filtered_ips = list({ip for ip in data.ip if ip_counts[ip] > 2})
-        
         # Group IPs by subnet to handle CDN scenarios
         subnet_ips = group_ips_by_subnet(filtered_ips)
         all_users_log[email] = subnet_ips
-        logger.info(data)
+        logger.info("User data: %s", data)
     total_ips = sum(len(ips) for ips in all_users_log.values())
     all_users_log = dict(
         sorted(
@@ -82,20 +83,28 @@ async def check_ip_used() -> dict:
             reverse=True,
         )
     )
-    
     # Create a more compact message format for better readability
     user_messages = []
     for email, ips in all_users_log.items():
-        if ips:
-            if len(ips) == 1:
-                # Single subnet - show it inline
-                user_messages.append(f"<code>{email}</code> with <code>{len(ips)}</code> active ip: <code>{ips[0]}</code>")
-            else:
-                # Multiple subnets - show them on separate lines
-                user_messages.append(f"<code>{email}</code> with <code>{len(ips)}</code> active ips:\n- " + "\n- ".join(ips))
-    
+        if not ips:
+            continue
+        if not show_single_ip_users and len(ips) == 1:
+            continue
+        if len(ips) == 1:
+            user_messages.append(
+                (
+                    f"<code>{email}</code> with <code>{len(ips)}</code> active ip: "
+                    f"<code>{ips[0]}</code>"
+                )
+            )
+        else:
+            user_messages.append(
+                (
+                    f"<code>{email}</code> with <code>{len(ips)}</code> active ips:\n- "
+                    + "\n- ".join(ips)
+                )
+            )
     logger.info("Number of all active ips: %s", str(total_ips))
-    
     # Add total count
     summary_message = f"---------\nCount Of All Active IPs: <b>{total_ips}</b>"
     
@@ -117,8 +126,8 @@ async def check_ip_used() -> dict:
     complete_message += "\n\n" + summary_message
     
     # Debug logging
-    logger.info(f"Complete message length: {len(complete_message)} characters")
-    logger.info(f"Message length limit: {MAX_MESSAGE_LENGTH} characters")
+    logger.info("Complete message length: %s characters", len(complete_message))
+    logger.info("Message length limit: %s characters", MAX_MESSAGE_LENGTH)
     
     # If message is under limit, send as single message
     if len(complete_message) <= MAX_MESSAGE_LENGTH:
@@ -141,7 +150,7 @@ async def check_ip_used() -> dict:
                 complete_message[:split_point].strip(),
                 complete_message[split_point:].strip()
             ]
-            logger.info(f"Split into 2 parts: {len(message_chunks[0])} and {len(message_chunks[1])} chars")
+            logger.info("Split into 2 parts: %s and %s chars", len(message_chunks[0]), len(message_chunks[1]))
         else:
             # Split into 3 parts
             part_length = total_length // 3
@@ -164,7 +173,7 @@ async def check_ip_used() -> dict:
                 complete_message[split_point1:split_point2].strip(),
                 complete_message[split_point2:].strip()
             ]
-            logger.info(f"Split into 3 parts: {len(message_chunks[0])}, {len(message_chunks[1])}, and {len(message_chunks[2])} chars")
+            logger.info("Split into 3 parts: %s, %s, and %s chars", len(message_chunks[0]), len(message_chunks[1]), len(message_chunks[2]))
     
     # Send all chunks
     for i, message in enumerate(message_chunks):
@@ -174,7 +183,7 @@ async def check_ip_used() -> dict:
         else:
             message = "<b>Active Users:</b>\n\n" + message
         
-        logger.info(f"Sending message part {i+1}/{len(message_chunks)} ({len(message)} chars)")
+        logger.info("Sending message part %d/%d (%d chars)", i + 1, len(message_chunks), len(message))
         try:
             await send_logs(message)
             # Add delay between messages to avoid rate limits

@@ -7,6 +7,7 @@ listing admins, setting special limits, and creating a config and more...
 import asyncio
 import os
 import sys
+import json
 
 try:
     from telegram import Update
@@ -575,6 +576,32 @@ async def get_time_to_active_users_handler(
     return ConversationHandler.END
 
 
+async def show_single_ip_users_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    check = await check_admin_privilege(update)
+    if check:
+        return check
+
+    if not context.args or context.args[0].lower() not in ("on", "off"):
+        await update.message.reply_html(
+            "Usage: <code>/show_single_ip_users on</code> or <code>/show_single_ip_users off</code>"
+        )
+        return
+
+    value = context.args[0].lower() == "on"
+    # Update config.json
+    try:
+        with open("config.json", "r", encoding="utf-8") as f:
+            config = json.load(f)
+        config["SHOW_SINGLE_IP_USERS"] = value
+        with open("config.json", "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2)
+        await update.message.reply_html(
+            f"SHOW_SINGLE_IP_USERS set to <b>{'on' if value else 'off'}</b>."
+        )
+    except Exception as e:
+        await update.message.reply_html(f"Failed to update config: <code>{e}</code>")
+
+
 application.add_handler(CommandHandler("start", start))
 application.add_handler(
     ConversationHandler(
@@ -720,6 +747,7 @@ application.add_handler(
 )
 application.add_handler(CommandHandler("admins_list", admins_list))
 application.add_handler(CommandHandler("show_except_users", show_except_users))
+application.add_handler(CommandHandler("show_single_ip_users", show_single_ip_users_command))
 unknown_handler = MessageHandler(filters.TEXT, start)
 application.add_handler(unknown_handler)
 unknown_handler_command = MessageHandler(filters.COMMAND, start)
