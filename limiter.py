@@ -1,5 +1,5 @@
 """
-Limiter.py is the 
+Limiter.py is the
 main file that run other files and functions to run the program.
 """
 
@@ -28,7 +28,7 @@ from utils.panel_api import (
 from utils.read_config import read_config
 from utils.types import PanelType
 
-VERSION = "1.0.6"
+VERSION = "0.2"
 
 parser = argparse.ArgumentParser(description="Help message")
 parser.add_argument("--version", action="version", version=VERSION)
