@@ -105,27 +105,58 @@ async def check_ip_used() -> dict:
     current_message = ""
     message_chunks = []
     
+    # First, build the complete message
+    complete_message = ""
     for user_msg in user_messages:
-        # Check if adding this user would exceed the limit
-        if len(current_message) + len(user_msg) + 2 > MAX_MESSAGE_LENGTH:
-            # Save current chunk and start a new one
-            if current_message:
-                message_chunks.append(current_message.strip())
-            current_message = user_msg
+        if complete_message:
+            complete_message += "\n\n" + user_msg
         else:
-            # Add to current chunk
-            if current_message:
-                current_message += "\n\n" + user_msg
-            else:
-                current_message = user_msg
+            complete_message = user_msg
     
-    # Add the last chunk if it has content
-    if current_message:
-        message_chunks.append(current_message.strip())
+    # Add summary
+    complete_message += "\n\n" + summary_message
     
-    # Add summary to the last chunk
-    if message_chunks:
-        message_chunks[-1] += "\n\n" + summary_message
+    # If message is under limit, send as single message
+    if len(complete_message) <= MAX_MESSAGE_LENGTH:
+        message_chunks = [complete_message]
+    else:
+        # Split into 2 or 3 parts
+        total_length = len(complete_message)
+        if total_length <= MAX_MESSAGE_LENGTH * 2:
+            # Split into 2 parts
+            split_point = total_length // 2
+            # Find a good split point (end of a user entry)
+            for i in range(split_point, min(split_point + 200, total_length)):
+                if complete_message[i] == '\n' and i + 1 < total_length and complete_message[i + 1] == '\n':
+                    split_point = i + 2
+                    break
+            
+            message_chunks = [
+                complete_message[:split_point].strip(),
+                complete_message[split_point:].strip()
+            ]
+        else:
+            # Split into 3 parts
+            part_length = total_length // 3
+            split_point1 = part_length
+            split_point2 = part_length * 2
+            
+            # Find good split points (end of user entries)
+            for i in range(split_point1, min(split_point1 + 200, total_length)):
+                if complete_message[i] == '\n' and i + 1 < total_length and complete_message[i + 1] == '\n':
+                    split_point1 = i + 2
+                    break
+            
+            for i in range(split_point2, min(split_point2 + 200, total_length)):
+                if complete_message[i] == '\n' and i + 1 < total_length and complete_message[i + 1] == '\n':
+                    split_point2 = i + 2
+                    break
+            
+            message_chunks = [
+                complete_message[:split_point1].strip(),
+                complete_message[split_point1:split_point2].strip(),
+                complete_message[split_point2:].strip()
+            ]
     
     # Send all chunks
     for i, message in enumerate(message_chunks):
