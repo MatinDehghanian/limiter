@@ -42,8 +42,6 @@ After running the command, you will see a menu with the following options:
 Enter your choice:
 ```
 
-![Loading Gif](readme_files/1.gif)
-
 And after that you need input your panel information and other settings:
 
 ![Loading Gif](readme_files/1.png)
@@ -117,10 +115,6 @@ limiter can be controlled via a Telegram bot. Here are the available commands:
       },
       ```
 
-    And also See this issue : [Read More Here](https://github.com/MatinDehghanian/limiter/issues/32)
-
-If you still have a problem you can open an issue on the [issues page](https://github.com/MatinDehghanian/limiter/issues)<br>
-**And also you can still use the old version of this script** [here](https://github.com/MatinDehghanian/limiter/tree/old_version)
 
 ## Using Cron Jobs
 
@@ -185,10 +179,6 @@ pip install -r requirements.txt
 python3 limiter.py
 ```
 
-then like older version you can use `screen` and `cornjob` to run it in background.<sub>(And also don't forget to add your panel information and bot token and telegram user id to config.json file)</sub><br>
-[run with screen](https://github.com/MatinDehghanian/limiter/blob/old_version/Marzban/README.md#screen)<br>
-[run with cornjob](https://github.com/MatinDehghanian/limiter/blob/old_version/Marzban/README.md#screen)<br>
-
 <sub>
 And a small side note if you want to make any changes to the code and then test it, you can use the `core_test.py` file to test the core functions of the program.(Please note that running this make your panel unstable so make sure you run it on a test panel)
 </sub>
@@ -199,7 +189,7 @@ And a small side note if you want to make any changes to the code and then test 
 
 If you found limiter useful and would like to support its development, you can donate on the following crypto network:
 
-- TRON network (TRX): `TLARb1Ns5vA7pH6wqSyZGreDbGooS85Mi5`
+https://nowpayments.io/donation/MattDev
 
 Thank you for your support!
 
